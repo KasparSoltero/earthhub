@@ -64,7 +64,7 @@ export class Future_values extends Earthhub_Base {
 export class Carbon_emissions extends Earthhub_Base {
     constructor() {
         super();
-        this.values = new Past_values({value_defaults: {unit: 'kgCO2e'}});
+        this.past_values = new Past_values({value_defaults: {unit: 'kgCO2e'}});
     }
 }
 

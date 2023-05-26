@@ -57,31 +57,51 @@ class ReferenceObject extends HTMLElement{
 	}
 }
 
-class HTML_DISPLAY extends HTMLElement{
-    constructor(name) {
+class BASIC_DISPLAY extends HTMLElement{
+    constructor () {
         super();
-        this.refers_to = name
+    }
+    render() {
+        this.innerHTML = this.getAttribute('name');
+    }
+    connectedCallback () {
+		console.log('connected!', this);
+		// Render HTML, event handlers etc
+        this.render();
+	}
+}
+
+class HTML_DISPLAY extends HTMLElement{
+    constructor() {
+        super();
+        this.refers_to = null;
     }
 
     findPersonClass() {
-        // Add the 'person' class to the element by name
         const name = this.getAttribute('name');
-        // Get all earthhub classes in window. The .html file must import the appropriate containing .js file before importing components.js
-        const exportedClasses = Object.values(window).filter(
-            (value) => typeof value === 'function' && value.prototype instanceof Earthhub_Base
-        );
-        // Check if name is in the window (if import worked)
-        const targetClass = exportedClasses.find(
-            (classObj) => classObj.name === name
-        );
-        // If the class is found, create an instance of it and assign it to 'refers_to'
+        const nameParts = name.split('.');
+        const className = nameParts.shift();
+
+        // Get the class from the window object
+        const targetClass = window[className];
         if (targetClass) {
-            this.refers_to = new targetClass();
+            // Create an instance of the class
+            const instance = new targetClass();
+
+            let propertyValue = instance;
+            for (const propertyName of nameParts) {
+                // Find the property within the instance
+                propertyValue = propertyValue[propertyName];
+                if (!propertyValue) {
+                    throw new Error(`Property "${propertyName}" not found in class "${className}"`);
+                }
+            }
+            // Assign the final property value to 'refers_to'
+            this.refers_to = propertyValue;
         } else {
-            // Throw an error if the class is not found
-            throw new Error(`Class "${name}" not found`);
+            throw new Error(`Class "${className}" not found`);
         }
-        
+
         console.log(this.refers_to); // Output: associated instance for testing
     }
 
@@ -94,43 +114,82 @@ class HTML_DISPLAY extends HTMLElement{
 
         // Access the 'name' attribute, set the 'person' class which the html element draws from.
         this.findPersonClass()
-
 		// Render HTML, event handlers etc
         this.render();
 	}
-    
 }
-class WHENUA_DISPLAY extends HTML_DISPLAY{
-    constructor(name) {
-        super(name);
+class SHOW_ALL extends HTML_DISPLAY{
+    constructor () {
+        super();
     }
-    /**
-	 * Runs each time the element is appended to or moved in the DOM
-	 */
-    connectedCallback () {
-		console.log('connected!', this);
-        // console.log(this.refers_to)
+    render() {
+        this.innerHTML = `
+            <select id="attribute-dropdown">
+                <option value="__placeholder">${this.refers_to.constructor.name}</option>
+                ${this.generateDropdownOptions()}
+            </select>
+            <div id="attribute-content"></div>
+        `;
+    
+        const dropdown = this.querySelector('#attribute-dropdown');
+        const attributeContent = this.querySelector('#attribute-content');
 
-        // // Access the 'name' attribute
-        // const name = this.getAttribute('name');
-        // console.log(name); // Output: "otautahi"
+        // Store the original text of each option as a data attribute, may change
+        Array.from(dropdown.options).forEach(option => {
+            option.dataset.originalText = option.textContent;
+        });
+    
+        dropdown.addEventListener('change', () => {
+            console.log('change to dropdown')
+            const selectedAttribute = dropdown.value;
+            if (selectedAttribute !== '__placeholder') {
+                const attributeValue = this.refers_to[selectedAttribute];
 
-        // // Check if 'name' attribute is 'otautahi'
-        // if (name === 'otautahi') {
-        //     // Create an instance of otautahi and assign it to 'refers_to'
-        //     this.refers_to = new otautahi();
-        //     console.log(this.refers_to); // Output: otautahi instance
-        // }
+                // Remove previously attached children
+                while (attributeContent.firstChild) {
+                    attributeContent.firstChild.remove();
+                }
+      
+                // for classes which can be expanded, create a new show-all element and append it
+                if (typeof attributeValue === 'object' && attributeValue !== null) {
+                    const showAllElement = document.createElement('show-all');
+        
+                    // Set the name attribute with appropriate format using dots
+                    showAllElement.setAttribute('name',
+                        `${this.getAttribute('name')}.${selectedAttribute}`);
+                    attributeContent.appendChild(showAllElement);
 
-		// Render HTML, event handlers etc
-        this.innerHTML ='';
-	}
-	/**
-	 * Runs when the element is removed from the DOM
-	 */
-	disconnectedCallback () {
-		console.log('disconnected', this);
-	}
+                } else if ((typeof attributeValue === 'string' || typeof attributeValue === 'number') && attributeValue !== null) {
+                    console.log('here')
+                    const basicDisplayElement = document.createElement('basic-display');
+                    basicDisplayElement.setAttribute('name', attributeValue);
+                    attributeContent.appendChild(basicDisplayElement);
+                    console.log(basicDisplayElement)
+
+                }
+                console.log(typeof attributeValue)
+        
+                // Restore the original text of all options
+                Array.from(dropdown.options).forEach(option => {
+                    option.textContent = option.dataset.originalText;
+                });
+                // Update the displayed text of the selected option to the head class for display, may change
+                const selectedOption = dropdown.options[dropdown.selectedIndex];
+                selectedOption.textContent = this.refers_to.constructor.name;
+            }
+        });
+    }
+    
+    generateDropdownOptions() {
+        const attributeList = Object.keys(this.refers_to);
+        const currentAttribute = this.getAttribute('name').split('.').pop(); // Get the current attribute name
+        return attributeList
+        .map((attribute) => {
+            const selected = attribute === currentAttribute ? 'selected' : '';
+            return `<option value="${attribute}" ${selected}>${attribute}</option>`;
+        })
+        .join('');
+    }
 }
 
 // Define web components for html
@@ -138,5 +197,6 @@ if ('customElements' in window) {
 	customElements.define('example-example', Example);
     customElements.define('reference-object',ReferenceObject);
     customElements.define('html-display',HTML_DISPLAY);
-    customElements.define('whenua-display',WHENUA_DISPLAY);
+    customElements.define('show-all',SHOW_ALL);
+    customElements.define('basic-display',BASIC_DISPLAY);
 }
