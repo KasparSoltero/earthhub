@@ -64,40 +64,39 @@ class HTML_DISPLAY extends HTMLElement{
     }
 
     findPersonClass() {
-
-    }
-
-    connectedCallback () {
-		console.log('connected!', this);
-
-        // Access the 'name' attribute, set the 'person' class
-        // which the html element draws from.
+        // Add the 'person' class to the element by name
         const name = this.getAttribute('name');
-        console.log(name); // Output: "otautahi"
-
         // Get all earthhub classes in window. The .html file must import the appropriate containing .js file before importing components.js
         const exportedClasses = Object.values(window).filter(
             (value) => typeof value === 'function' && value.prototype instanceof Earthhub_Base
         );
-
-        console.log(exportedClasses); // Output: [otautahi, ...]
-
-        // Check if 'name' attribute is in the list of exported classes
+        // Check if name is in the window (if import worked)
         const targetClass = exportedClasses.find(
             (classObj) => classObj.name === name
         );
-
+        // If the class is found, create an instance of it and assign it to 'refers_to'
         if (targetClass) {
             this.refers_to = new targetClass();
         } else {
             // Throw an error if the class is not found
             throw new Error(`Class "${name}" not found`);
         }
+        
+        console.log(this.refers_to); // Output: associated instance for testing
+    }
 
-        console.log(this.refers_to); // Output: otautahi instance
+    render() {
+        this.innerHTML = this.refers_to.constructor.name;
+    }
+
+    connectedCallback () {
+		console.log('connected!', this);
+
+        // Access the 'name' attribute, set the 'person' class which the html element draws from.
+        this.findPersonClass()
 
 		// Render HTML, event handlers etc
-        this.innerHTML ='';
+        this.render();
 	}
     
 }
@@ -134,7 +133,7 @@ class WHENUA_DISPLAY extends HTML_DISPLAY{
 	}
 }
 
-// Define the new web component
+// Define web components for html
 if ('customElements' in window) {
 	customElements.define('example-example', Example);
     customElements.define('reference-object',ReferenceObject);

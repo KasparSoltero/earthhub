@@ -25,20 +25,31 @@ export class Contributions extends Earthhub_Base {
 }
 
 export class Value extends Earthhub_Base {
-    constructor() {
+    constructor({ value = null, uncertainty = null, unit = '', contributions = null } = {}, defaults = {}) {
         super();
-        this.value = null;
-        this.uncertainty = null;
-        this.unit = '';
-        this.contributions = new Contributions;
+        this.value = value !== null ? value : defaults.value;
+        this.uncertainty = uncertainty !== null ? uncertainty : defaults.uncertainty;
+        this.unit = unit !== '' ? unit : defaults.unit;
+        this.contributions = contributions !== null ? contributions : new Contributions;
     }
 }
 
 export class Past_values extends Earthhub_Base {
-    constructor() {
+    constructor({value_defaults = {}} = {}) {
         super();
         this.times = [];
         this.values = [];
+        this.value_defaults = value_defaults;
+    }
+
+    set(values) {
+        for (const key in values) {
+            if (values.hasOwnProperty(key)) {
+                const valueObject = values[key];
+                const newValue = new Value(valueObject,this.value_defaults);
+                this.values.push(newValue);
+            }
+        }
     }
 }
 
@@ -53,7 +64,7 @@ export class Future_values extends Earthhub_Base {
 export class Carbon_emissions extends Earthhub_Base {
     constructor() {
         super();
-        this.values = new Past_values;
+        this.values = new Past_values({value_defaults: {unit: 'kgCO2e'}});
     }
 }
 
