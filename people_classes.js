@@ -1,7 +1,10 @@
 import {Whenua,Carbon_emissions,Value,Past_values,Future_values,Reference} from './definition_classes.js'
 
-export class otautahi extends Whenua {
+export class Otautahi extends Whenua {
     constructor() {
-        this.carbon_emissions.values.times = [new Value()]
+        super();
+        this.carbon_emissions.values.times = [new Value()];
     }
 }
+
+window.Otautahi = Otautahi
