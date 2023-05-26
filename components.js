@@ -1,4 +1,4 @@
-import { Earthhub_Base } from './definition_classes.js'
+import { Earthhub_Base, Value } from './definition_classes.js'
 
 class Example extends HTMLElement{
     constructor () {
@@ -57,6 +57,20 @@ class ReferenceObject extends HTMLElement{
 	}
 }
 
+class REFERENCE_DISPLAY extends HTMLElement{
+    constructor() {
+        super();
+    }
+
+    connectedCallback() {
+        this.render();
+      }
+    
+    render() {
+        this.innerHTML = 'testing'
+    }
+}
+
 class BASIC_DISPLAY extends HTMLElement{
     constructor () {
         super();
@@ -71,7 +85,7 @@ class BASIC_DISPLAY extends HTMLElement{
 	}
 }
 
-class HTML_DISPLAY extends HTMLElement{
+class PERSON_DISPLAY extends HTMLElement{
     constructor() {
         super();
         this.refers_to = null;
@@ -79,6 +93,7 @@ class HTML_DISPLAY extends HTMLElement{
 
     findPersonClass() {
         const name = this.getAttribute('name');
+
         const nameParts = name.split('.');
         const className = nameParts.shift();
 
@@ -110,7 +125,7 @@ class HTML_DISPLAY extends HTMLElement{
     }
 
     connectedCallback () {
-		console.log('connected!', this);
+		console.log('connected!',this);
 
         // Access the 'name' attribute, set the 'person' class which the html element draws from.
         this.findPersonClass()
@@ -118,11 +133,20 @@ class HTML_DISPLAY extends HTMLElement{
         this.render();
 	}
 }
-class SHOW_ALL extends HTML_DISPLAY{
-    constructor () {
-        super();
+class SHOW_ALL extends PERSON_DISPLAY {
+    constructor() {
+      super();
     }
+  
     render() {
+        if (this.refers_to instanceof Value) {
+            const valueDisplayElement = document.createElement('value-display');
+            valueDisplayElement.setAttribute('value', this.refers_to.value);
+            valueDisplayElement.setAttribute('unit', this.refers_to.unit);
+            valueDisplayElement.setAttribute('references', this.refers_to.references);
+            this.appendChild(valueDisplayElement);
+            return; // Exit early since value-display is created
+        }
         this.innerHTML = `
             <select id="attribute-dropdown">
                 <option value="__placeholder">${this.refers_to.constructor.name}</option>
@@ -145,29 +169,28 @@ class SHOW_ALL extends HTML_DISPLAY{
             if (selectedAttribute !== '__placeholder') {
                 const attributeValue = this.refers_to[selectedAttribute];
 
-                // Remove previously attached children
+                // Remove previously attached parts
                 while (attributeContent.firstChild) {
                     attributeContent.firstChild.remove();
                 }
       
-                // for classes which can be expanded, create a new show-all element and append it
-                if (typeof attributeValue === 'object' && attributeValue !== null) {
+                // attach parts 
+                if (Array.isArray(attributeValue)) {
+                    const arrayDisplayElement = document.createElement('array-display');
+                    arrayDisplayElement.setAttribute('name', `${this.getAttribute('name')}.${selectedAttribute}`);
+                    attributeContent.appendChild(arrayDisplayElement);
+                }
+                else if (typeof attributeValue === 'object' && attributeValue !== null) {
                     const showAllElement = document.createElement('show-all');
-        
-                    // Set the name attribute with appropriate format using dots
-                    showAllElement.setAttribute('name',
-                        `${this.getAttribute('name')}.${selectedAttribute}`);
+                    showAllElement.setAttribute('name', `${this.getAttribute('name')}.${selectedAttribute}`);
                     attributeContent.appendChild(showAllElement);
-
-                } else if ((typeof attributeValue === 'string' || typeof attributeValue === 'number') && attributeValue !== null) {
-                    console.log('here')
+                }
+                else if ((typeof attributeValue === 'string' || typeof attributeValue === 'number') && attributeValue !== null) {
                     const basicDisplayElement = document.createElement('basic-display');
                     basicDisplayElement.setAttribute('name', attributeValue);
                     attributeContent.appendChild(basicDisplayElement);
-                    console.log(basicDisplayElement)
-
+                    console.log(basicDisplayElement);
                 }
-                console.log(typeof attributeValue)
         
                 // Restore the original text of all options
                 Array.from(dropdown.options).forEach(option => {
@@ -191,12 +214,72 @@ class SHOW_ALL extends HTML_DISPLAY{
         .join('');
     }
 }
+class ARRAY_DISPLAY extends PERSON_DISPLAY {
+    constructor() {
+        super();
+    }
+    render() {
+        this.innerHTML = `
+            <div id="array-content">
+                ${this.generateShowAllElements()}
+            </div>
+        `;
+    }
+
+    generateShowAllElements() {
+        const container = document.createElement('div'); // Create a container element
+
+        const array = this.refers_to;
+        for (let i = 0; i < array.length; i++) {
+            const showAllElement = document.createElement('show-all');
+            const attributeName = `${this.getAttribute('name')}.${i}`; // Update the name attribute
+            showAllElement.setAttribute('name', attributeName);
+            
+            container.appendChild(showAllElement); // Append the show-all elements to the container
+        }
+
+        return container.innerHTML; // Return the HTML content of the container
+    }
+}
+
+class VALUE_DISPLAY extends HTMLElement {
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+        this.render()
+    }
+  
+    render() {
+        const value = this.getAttribute('value');
+        const unit = this.getAttribute('unit');
+        const reference = this.getAttribute('references');
+        
+        let output = `${value} (${unit})`;
+        
+        // if (reference.length>=1) {
+        //     console.log('adding references')
+        //     const arrayDisplayElement = document.createElement('reference-display');
+        //     arrayDisplayElement.setAttribute('name', `${this.getAttribute('name')}.references}`);
+        //     this.appendChild(arrayDisplayElement);
+        //     console.log(arrayDisplayElement)
+          
+        //     // output += ` [${reference}]`;
+        // }
+        
+        this.innerHTML = output;
+      }
+}
 
 // Define web components for html
 if ('customElements' in window) {
 	customElements.define('example-example', Example);
     customElements.define('reference-object',ReferenceObject);
-    customElements.define('html-display',HTML_DISPLAY);
+    customElements.define('person-display',PERSON_DISPLAY);
     customElements.define('show-all',SHOW_ALL);
     customElements.define('basic-display',BASIC_DISPLAY);
+    customElements.define('array-display',ARRAY_DISPLAY);
+    customElements.define('value-display', VALUE_DISPLAY);
+    customElements.define('reference-display',REFERENCE_DISPLAY);
 }

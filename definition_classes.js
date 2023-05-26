@@ -9,9 +9,19 @@ export class Earthhub_Base {
 }
 
 export class Reference extends Earthhub_Base {
-    constructor() {
+    constructor(key='', title = '', authors = '', year = '', journal = '', volume = '', number = '', pages = '', doi = '', url = '') {
         super();
         // Reference class attributes
+        this.key = key;
+        this.title = title;
+        this.authors = authors;
+        this.year = year;
+        this.journal = journal;
+        this.volume = volume;
+        this.number = number;
+        this.pages = pages;
+        this.doi = doi;
+        this.url = url;
     }
     // Reference class methods
 }
@@ -25,12 +35,13 @@ export class Contributions extends Earthhub_Base {
 }
 
 export class Value extends Earthhub_Base {
-    constructor({ value = null, uncertainty = null, unit = '', contributions = null } = {}, defaults = {}) {
+    constructor({ value = null, uncertainty = null, unit = '', contributions = null, references = null } = {}, defaults = {}) {
         super();
         this.value = value !== null ? value : defaults.value;
         this.uncertainty = uncertainty !== null ? uncertainty : defaults.uncertainty;
         this.unit = unit !== '' ? unit : defaults.unit;
         this.contributions = contributions !== null ? contributions : new Contributions;
+        this.references = references !== null ? references : []
     }
 }
 
@@ -73,7 +84,7 @@ export class Whenua extends Earthhub_Base {
         super();
         this.awa = [];
         this.carbon_emissions = new Carbon_emissions;
-        this.productions = [];
+        this.processes = [];
         this.animal_populations = [];
     }
 }
@@ -95,10 +106,19 @@ export class Awa extends Earthhub_Base {
     }
 }
 
-export class Production extends Earthhub_Base {
-    constructor(name) {
+export class Process extends Earthhub_Base {
+
+    constructor(name, {carbon_emissions_past = null} = {}) {
+        super();
         this.name = name;
-        this.carbon_emissions = new Carbon_emissions;
+        this.carbon_emissions = new Carbon_emissions();
+        this.carbon_emissions.past_values.set(carbon_emissions_past)
+    }
+}
+
+export class Production extends Earthhub_Base {
+    constructor() {
+        super();
     }
 }
 
