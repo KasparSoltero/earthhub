@@ -125,19 +125,16 @@ class PERSON_DISPLAY extends HTMLElement{
     }
 
     connectedCallback () {
-		console.log('connected!',this);
-
         // Access the 'name' attribute, set the 'person' class which the html element draws from.
         this.findPersonClass()
 		// Render HTML, event handlers etc
         this.render();
 	}
 }
-class SHOW_ALL extends PERSON_DISPLAY {
+class SHOW_ALL_DROPDOWN extends PERSON_DISPLAY {
     constructor() {
       super();
     }
-  
     render() {
         if (this.refers_to instanceof Value) {
             const valueDisplayElement = document.createElement('value-display');
@@ -181,7 +178,7 @@ class SHOW_ALL extends PERSON_DISPLAY {
                     attributeContent.appendChild(arrayDisplayElement);
                 }
                 else if (typeof attributeValue === 'object' && attributeValue !== null) {
-                    const showAllElement = document.createElement('show-all');
+                    const showAllElement = document.createElement('show-all-dropdown');
                     showAllElement.setAttribute('name', `${this.getAttribute('name')}.${selectedAttribute}`);
                     attributeContent.appendChild(showAllElement);
                 }
@@ -212,6 +209,52 @@ class SHOW_ALL extends PERSON_DISPLAY {
             return `<option value="${attribute}" ${selected}>${attribute}</option>`;
         })
         .join('');
+    }
+}
+class SHOW_ALL extends PERSON_DISPLAY {
+    constructor() {
+      super();
+    }
+    render() {
+        if (this.refers_to instanceof Value) {
+            const valueDisplayElement = document.createElement('value-display');
+            valueDisplayElement.setAttribute('value', this.refers_to.value);
+            valueDisplayElement.setAttribute('unit', this.refers_to.unit);
+            valueDisplayElement.setAttribute('references', this.refers_to.references);
+            valueDisplayElement.setAttribute('captions', this.refers_to.captions);
+            this.appendChild(valueDisplayElement);
+            return; // Exit early since value-display is created
+        }
+
+        this.innerHTML = `<div id="attribute-content"></div>`;
+
+        const attributeContent = this.querySelector('#attribute-content');
+        const attributeList = Object.keys(this.refers_to);
+
+        attributeList.forEach((attribute) => {
+            const attributeValue = this.refers_to[attribute];
+            const attributeElement = document.createElement('div');
+
+            attributeElement.innerHTML = `<span class="attribute-name">${attribute}</span>: `;
+
+            if (Array.isArray(attributeValue)) {
+                const arrayDisplayElement = document.createElement('array-display');
+                arrayDisplayElement.setAttribute('name', `${this.getAttribute('name')}.${attribute}`);
+                attributeElement.appendChild(arrayDisplayElement);
+            }
+            else if (typeof attributeValue === 'object' && attributeValue !== null) {
+                const showAllElement = document.createElement('show-all');
+                showAllElement.setAttribute('name', `${this.getAttribute('name')}.${attribute}`);
+                attributeElement.appendChild(showAllElement);
+            }
+            else if ((typeof attributeValue === 'string' || typeof attributeValue === 'number') && attributeValue !== null) {
+                const basicDisplayElement = document.createElement('basic-display');
+                basicDisplayElement.setAttribute('name', attributeValue);
+                attributeElement.appendChild(basicDisplayElement);
+            }
+
+            attributeContent.appendChild(attributeElement);
+        });
     }
 }
 class ARRAY_DISPLAY extends PERSON_DISPLAY {
@@ -255,8 +298,9 @@ class VALUE_DISPLAY extends HTMLElement {
         const value = this.getAttribute('value');
         const unit = this.getAttribute('unit');
         const reference = this.getAttribute('references');
+        const captions = this.getAttribute('captions');
         
-        let output = `${value} (${unit})`;
+        let output = `${value} (${unit}) ${captions}`;
         
         // if (reference.length>=1) {
         //     console.log('adding references')
@@ -282,4 +326,5 @@ if ('customElements' in window) {
     customElements.define('array-display',ARRAY_DISPLAY);
     customElements.define('value-display', VALUE_DISPLAY);
     customElements.define('reference-display',REFERENCE_DISPLAY);
+    customElements.define('show-all-dropdown',SHOW_ALL_DROPDOWN);
 }

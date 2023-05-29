@@ -6,6 +6,15 @@ export class Earthhub_Base {
         this.images = [];
     }
     // Earthhub_Base class methods
+    setCaption(captions) {
+        console.log('here')
+        console.log(captions)
+        if (!Array.isArray(captions)) {
+            captions = [captions]
+        }
+        this.captions = captions
+        return this
+    }
 }
 
 export class Reference extends Earthhub_Base {
@@ -41,7 +50,7 @@ export class Value extends Earthhub_Base {
         this.uncertainty = uncertainty !== null ? uncertainty : defaults.uncertainty;
         this.unit = unit !== '' ? unit : defaults.unit;
         this.contributions = contributions !== null ? contributions : new Contributions;
-        this.references = references !== null ? references : []
+        this.references = references !== null ? references : [];
     }
 }
 
@@ -86,6 +95,7 @@ export class Whenua extends Earthhub_Base {
         this.carbon_emissions = new Carbon_emissions;
         this.processes = [];
         this.animal_populations = [];
+        this.names = [];
     }
 }
 
