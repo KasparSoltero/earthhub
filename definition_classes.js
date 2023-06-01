@@ -7,8 +7,6 @@ export class Earthhub_Base {
     }
     // Earthhub_Base class methods
     setCaption(captions) {
-        console.log('here')
-        console.log(captions)
         if (!Array.isArray(captions)) {
             captions = [captions]
         }
@@ -88,14 +86,83 @@ export class Carbon_emissions extends Earthhub_Base {
     }
 }
 
+export class Ecosystem extends Earthhub_Base {
+    constructor({data = null} = {}) {
+        super();
+        this.carbon_emissions = new Carbon_emissions;
+        this.data = data !== null ? data : {observations: {path: null}}
+    }
+
+    async fetchObservations(filter = {}, locations = false) {
+        console.log('fetching');
+        try {
+          // Load the data asynchronously
+            const response = await fetch(this.data.observations.path);
+            const data = await response.text();
+            const lines = data.split('\n');
+        
+            // Determine the categories based on the first line
+            const categories = lines[0].split('\t');
+        
+            // Create an array to store the filtered records
+            const records = [];
+        
+            // Parse the data lines
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split('\t');
+        
+                // Create an object to store the record
+                const record = {};
+        
+                // Assign values to the corresponding categories dynamically
+                for (let j = 0; j < categories.length; j++) {
+                    const category = categories[j];
+                    record[category] = values[j];
+                }
+        
+                // Filter the record based on the provided filter
+                let includeRecord = true;
+                for (const key in filter) {
+                    if (Object.prototype.hasOwnProperty.call(filter, key) && filter[key] !== undefined) {
+                        const recordValue = String(record[key]).toLowerCase(); // Convert record value to lowercase
+                        const filterValue = String(filter[key]).toLowerCase(); // Convert filter value to lowercase
+                        if (recordValue !== filterValue) {
+                            includeRecord = false;
+                            break;
+                        }
+                    }
+                }
+
+                // Add the record to the filtered records array if it passes the filter
+                if (includeRecord) {
+                    records.push(record);
+                }
+            }
+      
+            // Count the occurrences
+            const occurrences = records.length;
+        
+            // Return the results
+            return {
+                occurrences,
+                records
+            };
+        } catch (error) {
+          console.error('Error loading data:', error);
+          throw error;
+        }
+    }      
+}
+
 export class Whenua extends Earthhub_Base {
     constructor() {
         super();
         this.awa = [];
-        this.carbon_emissions = new Carbon_emissions;
+        this.carbon_emissions = new Carbon_emissions();
         this.processes = [];
         this.animal_populations = [];
         this.names = [];
+        this.ecosystem = new Ecosystem();
     }
 }
 

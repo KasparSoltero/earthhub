@@ -125,6 +125,7 @@ class PERSON_DISPLAY extends HTMLElement{
     }
 
     connectedCallback () {
+        console.log('connected!', this)
         // Access the 'name' attribute, set the 'person' class which the html element draws from.
         this.findPersonClass()
 		// Render HTML, event handlers etc
@@ -316,15 +317,118 @@ class VALUE_DISPLAY extends HTMLElement {
       }
 }
 
+class ECOSYSTEM_DISPLAY extends PERSON_DISPLAY {
+    constructor() {
+        super();
+        this.filter = {};
+        this.locations = false;
+    }
+
+    async fetchObservations() {
+        if (!this.refers_to || !this.refers_to.fetchObservations) {
+            throw new Error('fetchObservations function not found in the associated class');
+        }
+
+        try {
+            const { occurrences, records } = await this.refers_to.fetchObservations(this.filter, this.locations);
+
+            const resultsContainer = document.createElement('div');
+            resultsContainer.innerHTML = `
+                <div>
+                    <h2>Observations</h2>
+                    <p>Occurrences: ${occurrences}</p>
+                    <ul>
+                    ${records
+                        .map(record => `<li>${record.species} - ${record.year}</li>`)
+                        .join('')}
+                    </ul>
+                </div>
+            `;
+
+            // Insert results container below the filter fields
+            this.parentNode.insertBefore(resultsContainer, this.nextSibling);
+        } catch (error) {
+            console.error('Error loading data:', error);
+            throw error;
+        }
+    }
+
+    render() {
+        this.innerHTML = `
+            <div>
+                <h1>Ecosystem Display</h1>
+                <label for="species">Species:</label>
+                <input type="text" id="species">
+                <br>
+                <label for="year">Year:</label>
+                <input type="text" id="year">
+                <br>
+                <label for="kingdom">Kingdom:</label>
+                <input type="text" id="kingdom">
+                <br>
+                <input type="checkbox" id="locations">
+                <label for="locations">Include Locations</label>
+                <br>
+                <button id="fetchButton">Fetch Observations</button>
+            </div>
+        `;
+
+        const speciesInput = this.querySelector('#species');
+        const yearInput = this.querySelector('#year');
+        const kingdomInput = this.querySelector('#kingdom');
+        const locationsCheckbox = this.querySelector('#locations');
+        const fetchButton = this.querySelector('#fetchButton');
+
+        fetchButton.addEventListener('click', async () => {
+            this.filter = {
+                species: speciesInput.value || undefined,
+                year: yearInput.value || undefined,
+                kingdom: kingdomInput.value || undefined
+            };
+
+            this.locations = locationsCheckbox.checked;
+            await this.fetchObservations();
+        });
+    }
+}
+
+class EarthhubBorder extends HTMLElement {
+    constructor() {
+      super();
+    }
+  
+    connectedCallback() {
+        this.innerHTML = `
+        <div class='border-left'></div>
+        <div class='border-right'></div>
+        `
+        this.updateBorderHeight();
+    
+        window.addEventListener('scroll', this.updateBorderHeight.bind(this));
+    }
+  
+    updateBorderHeight() {
+      const windowHeight = window.innerHeight;
+      const documentHeight = Math.max(
+        document.body.scrollHeight, 
+        document.documentElement.scrollHeight
+      );
+  
+      this.style.height = documentHeight > windowHeight ? `${documentHeight}px` : '100vh';
+    }
+}
+
 // Define web components for html
 if ('customElements' in window) {
-	customElements.define('example-example', Example);
-    customElements.define('reference-object',ReferenceObject);
-    customElements.define('person-display',PERSON_DISPLAY);
-    customElements.define('show-all',SHOW_ALL);
-    customElements.define('basic-display',BASIC_DISPLAY);
-    customElements.define('array-display',ARRAY_DISPLAY);
-    customElements.define('value-display', VALUE_DISPLAY);
-    customElements.define('reference-display',REFERENCE_DISPLAY);
-    customElements.define('show-all-dropdown',SHOW_ALL_DROPDOWN);
+	customElements.define('example-example', Example)
+    customElements.define('reference-object',ReferenceObject)
+    customElements.define('person-display',PERSON_DISPLAY)
+    customElements.define('show-all',SHOW_ALL)
+    customElements.define('basic-display',BASIC_DISPLAY)
+    customElements.define('array-display',ARRAY_DISPLAY)
+    customElements.define('value-display', VALUE_DISPLAY)
+    customElements.define('reference-display',REFERENCE_DISPLAY)
+    customElements.define('show-all-dropdown',SHOW_ALL_DROPDOWN)
+    customElements.define('ecosystem-display',ECOSYSTEM_DISPLAY)
+    customElements.define('earthhub-border',EarthhubBorder)
 }

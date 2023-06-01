@@ -16,27 +16,40 @@ body {
 }
 
 /* EARTHHUB */
-border {
-	display:block;
-	position:absolute;
-	z-index:9;
-	left: 0;
-	width:var(--border-width);
-	height:100vh;
-	background-color: var(--page-border-color);
-	overflow:hidden;
-} .right {
-	left:unset;
-	right:0;
+earthhub-border {
+	box-sizing: border-box;
+	position: absolute;
+	z-index: 9;
+	width: 100vw;
+	height: 120vh;
 }
-border img {
-	padding:10%;
+.border-left::before {
+	left: 0;
+}
+.border-right::before {
+	right: 0;
+}
+
+.border-left::before, .border-right::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 10vw;
+	background-color: var(--page-border-color);
+	background-image: url('lib/graphics/border.png');
+	background-repeat: repeat-y;
+	background-position: top;
+	background-size: auto;
+	background-width: 100%;
 }
 
 page {
+	box-sizing: border-box;
 	/* display:flex; */
 	/* width:calc(var(--page-width) - calc(2 * var(--margins-width))); */
-	width:var(--page-width);
+	/* width:var(--page-width); */
+	width:80vw;
 	min-height:calc(100vh - calc(2 * var(--margins-width)));
 	z-index:8;
 	position:absolute;

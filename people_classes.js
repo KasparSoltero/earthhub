@@ -63,6 +63,12 @@ export class Otautahi extends Whenua {
             ['Todiramphus sanctus', null], ['Turdus merula', null], ['Turdus philomelos', null], ['Urodynamis taitensis', null], ['Vanellus miles', null], 
             ['Zosterops lateralis', null]] //source inaturalist, temporary placement
         }).setCaption('birds')
+        this.ecosystem.data = {observations: {path: 'lib/data/otautahi_observations.txt'}}
+
+        // console.log(this.ecosystem.fetchObservations({
+        //     species: 'Chamaecytisus prolifer',
+        //     year: 2021
+        // }))
     }
 }
 
