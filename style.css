@@ -19,7 +19,7 @@ body {
 earthhub-border {
 	box-sizing: border-box;
 	position: absolute;
-	z-index: 9;
+	z-index: -1;
 	width: 100vw;
 	height: 120vh;
 }
