@@ -44,6 +44,118 @@ earthhub-border {
 	background-width: 100%;
 }
 
+#dropdownContainer {
+    position: relative;
+    display: inline-block;
+}
+
+#dropdownMenu {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+}
+
+#dropdownMenu.show {
+    display: block;
+}
+
+.filterItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filterItem label {
+    margin-right: 10px;
+}
+
+
+/* ORGANIZATION DISPLAY */
+.organization-display {
+    background-color: #f0f0f0;
+    padding: 2em;
+    margin: 2em;
+}
+
+.organization-display h1 {
+    color: #000000;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.organization-display p {
+    color: #000000;
+    font-size: 1em;
+    font-family: 'Courier New', Courier, sans-serif;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+ecosystem-display {
+	display: block;
+	background-color: #f0f0f0;
+	padding: 2em;
+	margin: 2em;
+}
+
+ecosystem-display h1 {
+	color: #000000;
+	font-size: 2em;
+	font-weight: bold;
+}
+ecosystem-display p {
+	color: #000000;
+	font-size: 1em;
+	font-family: 'Courier New', Courier, sans-serif;
+	font-weight: bold;
+	line-height: 1.5;
+}
+
+story-display {
+	display: block;
+	background-color: #f0f0f0;
+	padding: 2em;
+	margin: 2em;
+}
+
+story-display h1 {
+	color: #000000;
+	font-size: 2em;
+	font-weight: bold;
+}
+
+story-display p {
+	color: #000000;
+	font-size: 1em;
+	font-family: 'Courier New', Courier, sans-serif;
+	font-weight: bold;
+	line-height: 1.5;
+}
+
+story-display img {
+	width: calc(50% - 5px); /* Set initial width to 50% */
+	overflow:hidden;
+	aspect-ratio: 1 / 1;
+
+	/* Apply different styles for smaller screens */
+	@media (max-width: 600px) {
+	  width: 100vw; /* Set width to full viewport width on smaller screens */
+	}
+}
+
+reference-display {
+	display: block;
+	background-color: #f0f0f0;
+	font: 1em 'Courier New', Courier, sans-serif;
+}
+:-webkit-any-link {
+	color: #000000;
+}
+
 page {
 	box-sizing: border-box;
 	/* display:flex; */

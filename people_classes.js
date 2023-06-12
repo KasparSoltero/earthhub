@@ -1,4 +1,4 @@
-import {Whenua,Process,Carbon_emissions,Value,Past_values,Future_values,Reference} from './definition_classes.js'
+import {Story,Whenua,Organisation,Process,Carbon_emissions,Value,Past_values,Future_values,Reference} from './definition_classes.js'
 
 export class Otautahi extends Whenua {
     constructor() {
@@ -31,49 +31,65 @@ export class Otautahi extends Whenua {
             new Value({value:'waitaha'}),
             new Value({value:'karaitiana'}).setCaption('transliteration of christian, used before 1930-1940'),
         ]
-        this.animal_populations = new Value({value:[
-            ['Acanthis flammea', null], ['Acanthisitta chloris', null], ['Acridotheres tristis', null], ['Aix galericulata', null], ['Alauda arvensis', null], 
-            ['Alisterus scapularis', null], ['Anarhynchus frontalis', null], ['Anas chlorotis', null], ['Anas gracilis', null], ['Anas platyrhynchos', null], 
-            ['Anas rhynchotis', null], ['Anas superciliosa', null], ['Anser anser', null], ['Anthornis melanura', null], ['Anthus novaeseelandiae', null], 
-            ['Apteryx mantelli', null], ['Apteryx owenii', null], ['Ardea alba', null], ['Ardea modesta', null], ['Arenaria interpres', null], 
-            ['Aythya australis', null], ['Aythya novaeseelandiae', null], ['Branta canadensis', null], ['Cacatua galerita', null], ['Cairina moschata', null], 
-            ['Calidris canutus', null], ['Callaeas cinereus', null], ['Callipepla californica', null], ['Carduelis carduelis', null], ['Charadrius bicinctus', null], 
-            ['Charadrius obscurus', null], ['Chlidonias albostriatus', null], ['Chlidonias leucopterus', null], ['Chlidonias niger', null], ['Chloris chloris', null], 
-            ['Chroicocephalus bulleri', null], ['Chroicocephalus novaehollandiae', null], ['Chroicocephalus scopulinus', null], ['Chrysococcyx lucidus', null], ['Circus approximans', null], 
-            ['Columba livia', null], ['Corvus frugilegus', null], ['Coturnix japonica', null], ['Coturnix ypsilophora', null], ['Cyanoramphus auriceps', null], 
-            ['Cyanoramphus novaezelandiae', null], ['Cygnus atratus', null], ['Daption capense', null], ['Diomedea epomophora', null], ['Diomedea exulans', null], 
-            ['Diomedea sanfordi', null], ['Egretta novaehollandiae', null], ['Egretta sacra', null], ['Elseyornis melanops', null], ['Emberiza cirlus', null], 
-            ['Emberiza citrinella', null], ['Eudyptula minor', null], ['Falco novaeseelandiae', null], ['Fregetta tropica', null], ['Fringilla coelebs', null], 
-            ['Fulica atra', null], ['Gallirallus australis', null], ['Gallirallus philippensis', null], ['Gallus gallus', null], ['Garrodia nereis', null], 
-            ['Gerygone igata', null], ['Gymnorhina tibicen', null], ['Haematopus finschi', null], ['Haematopus unicolor', null], ['Hemiphaga novaeseelandiae', null], 
-            ['Himantopus leucocephalus', null], ['Hirundo neoxena', null], ['Hydroprogne caspia', null], ['Larus dominicanus', null], ['Leucocarbo carunculatus', null], 
-            ['Limosa lapponica', null], ['Macronectes giganteus', null], ['Macronectes halli', null], ['Megadyptes antipodes', null], ['Meleagris gallopavo', null], 
-            ['Microcarbo melanoleucos', null], ['Mohoua albicilla', null], ['Morus serrator', null], ['Nestor meridionalis', null], ['Ninox novaeseelandiae', null], 
-            ['Notiomystis cincta', null], ['Numenius madagascariensis', null], ['Pachyptila salvini', null], ['Pachyptila turtur', null], ['Pachyptila vittata', null], 
-            ['Passer domesticus', null], ['Pavo cristatus', null], ['Pelagodroma marina', null], ['Pelecanoides urinatrix', null], ['Petroica australis', null], 
-            ['Petroica macrocephala', null], ['Phalacrocorax carbo', null], ['Phalacrocorax punctatus', null], ['Phalacrocorax sulcirostris', null], ['Phalacrocorax varius', null], 
-            ['Phasianus colchicus', null], ['Philesturnus carunculatus', null], ['Phoebetria palpebrata', null], ['Platalea regia', null], ['Platycercus eximius', null], 
-            ['Poliocephalus rufopectus', null], ['Poodytes punctatus', null], ['Porphyrio hochstetteri', null], ['Porphyrio melanotus', null], ['Porzana tabuensis', null], 
-            ['Procellaria aequinoctialis', null], ['Procellaria parkinsoni', null], ['Procellaria westlandica', null], ['Prosthemadera novaeseelandiae', null], ['Prunella modularis', null], 
-            ['Pterodroma cookii', null], ['Pterodroma macroptera', null], ['Puffinus assimilis', null], ['Puffinus bulleri', null], ['Puffinus carneipes', null], 
-            ['Puffinus gavia', null], ['Puffinus griseus', null], ['Puffinus huttoni', null], ['Puffinus tenuirostris', null], ['Rhipidura fuliginosa', null], 
-            ['Serinus canaria', null], ['Stercorarius antarcticus', null], ['Stercorarius parasiticus', null], ['Stercorarius pomarinus', null], ['Sterna paradisaea', null], 
-            ['Sterna striata', null], ['Streptopelia roseogrisea', null], ['Sturnus vulgaris', null], ['Tadorna variegata', null], ['Thalassarche bulleri', null], 
-            ['Thalassarche cauta', null], ['Thalassarche melanophris', null], ['Thalassarche salvini', null], ['Thalassoica antarctica', null], ['Thinornis novaeseelandiae', null], 
-            ['Todiramphus sanctus', null], ['Turdus merula', null], ['Turdus philomelos', null], ['Urodynamis taitensis', null], ['Vanellus miles', null], 
-            ['Zosterops lateralis', null]] //source inaturalist, temporary placement
-        }).setCaption('birds')
         this.ecosystem.data = {observations: {path: 'lib/data/otautahi_observations.txt'}}
-
-        // console.log(this.ecosystem.fetchObservations({
-        //     species: 'Chamaecytisus prolifer',
-        //     year: 2021
-        // }))
+        this.ecosystem.images = ['otautahi-ecosystem-background.png']
+        this.ecosystem.captions = ['Data sourced from New Zealand Garden Bird Survey, iNaturalist Research-grade Observations, and eBird Observation Dataset: https://doi.org/10.15468/dl.95yhwr']
     }
 }
 
+export class Earthhub extends Organisation {
+    constructor() {
+        super();
+        this.captions = ["We seek a just and immediate systemic change to the city of Ōtautahi, to recognise rangitiratanga and fulfill te Tiriti o Waitangi, and to abolish the heirarchies of ability, age, class, faith, gender, race, and sexuality. We advocate the tikanga māori led ceasing of all extractive dependancies of the city, and the restoration of all rākau, manu, and ika species native to Ōtautahi. We practice this change through social and physical media, collaboration, agitation, and direct action"]
+    }
+}
+
+export class Native_Trees extends Story {
+    constructor() {
+        super();
+        this.images = ['story-native-trees-0.png','story-native-trees-1.png']
+        this.references = [
+            new Reference({
+                key: 'barnagaud_habitat_2014',
+                title: 'Habitat filtering by landscape and local forest composition in native and exotic New Zealand birds',
+                volume: '95',
+                issn: '0012-9658',
+                doi: '10.1890/13-0791.1',
+                pages: '78-87',
+                number: '1',
+                journaltitle: 'Ecology',
+                shortjournal: 'Ecology',
+                author: 'Barnagaud, Jean-Yves and Barbaro, Luc and Papaïx, Julien and Deconchat, Marc and Brockerhoff, Eckehard G.',
+                date: '2014-01',
+                pmid: '24649648',
+                keywords: 'aotearoa, New Zealand, Birds, bird, Animals, ecosystem dynamics, Demography, Ecosystem, Introduced Species, Trees'
+              }),
+              new Reference({
+                key: 'black_how_2017',
+                title: 'How much of the red zone needs to go green to support native birds?',
+                url: 'https://www.stuff.co.nz/the-press/business/the-rebuild/90670748/how-much-of-the-red-zone-needs-to-go-green-to-support-native-birds',
+                author: 'Black, Amanda',
+                urldate: '2023-05-30',
+                date: '2017-03-21',
+                langid: 'english',
+                note: 'Section: the-press'
+              }),
+              new Reference({
+                key: 'malcolm_kaitiakitanga_2023',
+                title: 'Kaitiakitanga with Tame Malcolm',
+                url: 'https://www.sciencelearn.org.nz/resources/3150-kaitiakitanga-with-tame-malcolm',
+                author: 'Malcolm, Tame',
+                urldate: '2023-06-12',
+                langid: 'english',
+                file: 'Snapshot:C:\\Users\\khs36\\Zotero\\storage\\QBHTKPR4\\3150-kaitiakitanga-with-tame-malcolm.html:text/html'
+              }),
+        ]
+    }
+}
 
 window['Otautahi'] = Otautahi;
+window['Earthhub'] = Earthhub;
+window['Native_Trees'] = Native_Trees;
 
 function addPropertiesToWindow(obj, windowObj) {
     for (const key in obj) {
@@ -89,3 +105,7 @@ function addPropertiesToWindow(obj, windowObj) {
 
 const otautahiInstance = new Otautahi();
 addPropertiesToWindow(otautahiInstance, Otautahi);
+const earthhubInstance = new Earthhub();
+addPropertiesToWindow(earthhubInstance, Earthhub);
+const nativeTreesInstance = new Native_Trees();
+addPropertiesToWindow(nativeTreesInstance, Native_Trees);

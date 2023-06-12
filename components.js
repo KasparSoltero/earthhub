@@ -57,20 +57,6 @@ class ReferenceObject extends HTMLElement{
 	}
 }
 
-class REFERENCE_DISPLAY extends HTMLElement{
-    constructor() {
-        super();
-    }
-
-    connectedCallback() {
-        this.render();
-      }
-    
-    render() {
-        this.innerHTML = 'testing'
-    }
-}
-
 class BASIC_DISPLAY extends HTMLElement{
     constructor () {
         super();
@@ -131,6 +117,29 @@ class PERSON_DISPLAY extends HTMLElement{
 		// Render HTML, event handlers etc
         this.render();
 	}
+}
+class REFERENCE_DISPLAY extends PERSON_DISPLAY{
+    constructor() {
+        super();
+    }
+
+    render() {
+        let reference_count = this.getAttribute('index')
+        const reference_for = this.refers_to;
+        const reference = reference_for.references[reference_count]
+
+        const name = reference.key;
+        const year = reference.date.substring(0, 4);
+        const urlyear = reference.urldate.substring(0, 4);
+        const url = reference.url;
+    
+        const link = document.createElement('a');
+        link.href = url;
+        link.textContent = `${parseInt(reference_count)+1} - ${name} (${year? year: urlyear})`;
+    
+        this.innerHTML = '';
+        this.appendChild(link);
+    }
 }
 class SHOW_ALL_DROPDOWN extends PERSON_DISPLAY {
     constructor() {
@@ -320,75 +329,291 @@ class VALUE_DISPLAY extends HTMLElement {
 class ECOSYSTEM_DISPLAY extends PERSON_DISPLAY {
     constructor() {
         super();
-        this.filter = {};
+        this.filter = {
+            // year: [2014],
+            // order: ['polypodiales'],
+        };
         this.locations = false;
+        this.map_bounds = {
+            lat: [43.348663,43.725275], // replace with actual bounds
+            lng: [172.426615, 172.825476] // replace with actual bounds
+        };
+        this.display_settings = {
+            minimum_observations: 1,
+            maximum_observations: 100,
+            minimum_opacity: 0.5,
+            maximum_opacity: 1,
+            colour: '#94C23D'
+        }
     }
 
-    async fetchObservations() {
+    async drawData() {
         if (!this.refers_to || !this.refers_to.fetchObservations) {
             throw new Error('fetchObservations function not found in the associated class');
         }
-
+        if (!this.refers_to.images[0]) {
+            throw new Error('No background image in the associated ecosystem class');
+        }
+    
         try {
+            const mapBounds = this.map_bounds;
+    
+            const mapContainer = this.querySelector('#mapContainer');
+            const mapSize = {
+                width: mapContainer.offsetWidth,
+                height: mapContainer.offsetWidth
+            };
+    
+            const gridSize = 100; // Define the size of the grid
+    
+            const latScale = d3.scaleQuantize() // Use scaleQuantize to divide the domain into discrete bins
+                .domain(mapBounds.lat)
+                .range(d3.range(gridSize));
+
+            const lngScale = d3.scaleQuantize()
+                .domain(mapBounds.lng)
+                .range(d3.range(gridSize));
+    
             const { occurrences, records } = await this.refers_to.fetchObservations(this.filter, this.locations);
+    
+            mapContainer.innerHTML = ''; // Clear the mapContainer element
+            const svg = d3.select(mapContainer).append('svg')
+                .attr('width', 'calc('+mapSize.width+'px - 10px)')
+                .attr('height', 'calc('+mapSize.width+'px - 10px)')
+    
+            // Draw the background image
+            svg.append('image')
+            .attr('xlink:href', 'lib/images/' + this.refers_to.images[0])
+            .attr('width', 'calc('+mapSize.width+'px - 10px)')
+            .attr('height', 'calc('+mapSize.width+'px - 10px)');
 
-            const resultsContainer = document.createElement('div');
-            resultsContainer.innerHTML = `
-                <div>
-                    <h2>Observations</h2>
-                    <p>Occurrences: ${occurrences}</p>
-                    <ul>
-                    ${records
-                        .map(record => `<li>${record.species} - ${record.year}</li>`)
-                        .join('')}
-                    </ul>
-                </div>
-            `;
+            // Create a 2D array to store the count of observations in each grid square
+            let gridData = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
+    
+            records.forEach(record => {
+                if (record.decimalLatitude && record.decimalLongitude) {
+                    const x = Math.floor(lngScale(record.decimalLongitude));
+                    const y = Math.floor(latScale(-record.decimalLatitude));
+                    gridData[y][x]++; // Increment the count for the grid square
+                }
+            });
 
-            // Insert results container below the filter fields
-            this.parentNode.insertBefore(resultsContainer, this.nextSibling);
+            // Find the maximum number of observations in the grid squares
+            let maxGridObservations = 0;
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (gridData[i][j] > maxGridObservations) {
+                        maxGridObservations = gridData[i][j];
+                    }
+                }
+            }
+
+            // Check if the maximum number of observations in the grid squares is less than the maximum observations display setting
+            if (maxGridObservations < this.display_settings.maximum_observations) {
+                this.display_settings.maximum_observations = maxGridObservations;
+            }
+    
+            // Retrieve display settings from the class
+            const {
+                minimum_observations,
+                maximum_observations,
+                minimum_opacity,
+                maximum_opacity,
+                colour
+            } = this.display_settings;
+
+            // Draw the grid squares
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    // Normalize the observation count to the range [0, 1]
+                    let normalizedCount = (gridData[i][j] - minimum_observations) / (maximum_observations - minimum_observations);
+                    // Scale the normalized count to the opacity range [minimum_opacity, maximum_opacity]
+                    let opacity = normalizedCount * (maximum_opacity - minimum_opacity) + minimum_opacity;
+                    // Clamp the opacity to the range [minimum_opacity, maximum_opacity]
+                    opacity = Math.max(minimum_opacity, Math.min(maximum_opacity, opacity));
+                    // Remove empty data points
+                    if (!(gridData[i][j] > 0)) {
+                        opacity = 0;
+                    }
+
+                    svg.append('rect')
+                        .attr('x', j * mapSize.width / gridSize)
+                        .attr('y', i * mapSize.height / gridSize)
+                        .attr('width', mapSize.width / gridSize)
+                        .attr('height', mapSize.height / gridSize)
+                        .attr('fill', colour) // Use the provided colour
+                        .attr('opacity', opacity); // Set the opacity based on the count of observations
+                }
+            }
         } catch (error) {
             console.error('Error loading data:', error);
             throw error;
-        }
+        }   
     }
+    
 
     render() {
+
+        let name = this.getAttribute('name');
+        let reference = this.refers_to.captions[0]
+
         this.innerHTML = `
-            <div>
-                <h1>Ecosystem Display</h1>
-                <label for="species">Species:</label>
-                <input type="text" id="species">
-                <br>
-                <label for="year">Year:</label>
-                <input type="text" id="year">
-                <br>
-                <label for="kingdom">Kingdom:</label>
-                <input type="text" id="kingdom">
-                <br>
-                <input type="checkbox" id="locations">
-                <label for="locations">Include Locations</label>
-                <br>
-                <button id="fetchButton">Fetch Observations</button>
-            </div>
+                <h1>Ōtautahi's ecosystem (${name})</h1>
+                <div id="dropdownContainer">
+                    <button id="filterButton">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <div id="dropdownMenu" class="dropdown-content">
+                        <div class="filterItem">
+                            <label for="kingdom">Kingdom:</label>
+                            <input type="text" id="kingdom">
+                        </div>
+                        <div class="filterItem">
+                            <label for="phylum">Phylum:</label>
+                            <input type="text" id="phylum">
+                        </div>
+                        <div class="filterItem">
+                            <label for="class">Class:</label>
+                            <input type="text" id="class">
+                        </div>
+                        <div class="filterItem">
+                            <label for="order">Order:</label>
+                            <input type="text" id="order">
+                        </div>
+                        <div class="filterItem">
+                            <label for="family">Family:</label>
+                            <input type="text" id="family">
+                        </div>
+                        <div class="filterItem">
+                            <label for="genus">Genus:</label>
+                            <input type="text" id="genus">
+                        </div>
+                        <div class="filterItem">
+                            <label for="species">Species:</label>
+                            <input type="text" id="species">
+                        </div>
+                        <div class="filterItem">
+                            <label for="year">Year:</label>
+                            <input type="text" id="year">
+                        </div>
+                        <div class="filterItem">
+                            <label for="month">Month:</label>
+                            <input type="text" id="month">
+                        </div>
+                    </div>
+                </div>
+                <button id="fetchButton">Reload Data</button>
+                <div id="mapContainer"><svg></svg></div>
+                <p>Source: ${reference}</p>
         `;
 
-        const speciesInput = this.querySelector('#species');
-        const yearInput = this.querySelector('#year');
-        const kingdomInput = this.querySelector('#kingdom');
-        const locationsCheckbox = this.querySelector('#locations');
-        const fetchButton = this.querySelector('#fetchButton');
+        // Event listener to handle click on filter button
+        const filterButton = this.querySelector('#filterButton');
+        filterButton.addEventListener('click', () => {
+            document.getElementById("dropdownMenu").classList.toggle("show");
+        });
+    
+        // Event listener to handle click outside of the dropdown
+        window.onclick = function(event) {
+            if (!event.target.matches('#filterButton') && !event.target.matches('#dropdownMenu') && !event.target.matches('#dropdownMenu *')) {
+                let dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    let openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    
+        const speciesInput = document.querySelector('#species');
+        const yearInput = document.querySelector('#year');
+        const kingdomInput = document.querySelector('#kingdom');
+        const phylumInput = document.querySelector('#phylum');
+        const classInput = document.querySelector('#class');
+        const orderInput = document.querySelector('#order');
+        const familyInput = document.querySelector('#family');
+        const genusInput = document.querySelector('#genus');
+        const monthInput = document.querySelector('#month');
+        const fetchButton = document.querySelector('#fetchButton');
+        const mapContainer = document.querySelector('#mapContainer');
+
+        // Add CSS styling to the mapContainer element
+        mapContainer.style.width = 'calc(100% - 10px)'; // Set width to 100% of the parent element, accounting for the border
+        mapContainer.style.paddingBottom = '-10px'; // Set the paddingBottom to 0 to avoid extra height
+        mapContainer.style.position = 'relative';
+        mapContainer.style.border = '5px solid #000'; // Add a border for visual clarity
 
         fetchButton.addEventListener('click', async () => {
             this.filter = {
                 species: speciesInput.value || undefined,
                 year: yearInput.value || undefined,
-                kingdom: kingdomInput.value || undefined
+                kingdom: kingdomInput.value || undefined,
+                phylum: phylumInput.value || undefined,
+                class: classInput.value || undefined,
+                order: orderInput.value || undefined,
+                family: familyInput.value || undefined,
+                genus: genusInput.value || undefined,
+                month: monthInput.value || undefined
             };
 
-            this.locations = locationsCheckbox.checked;
-            await this.fetchObservations();
+            await this.drawData();
         });
+
+        // Call drawData() function once at the beginning
+        (async () => {
+            try {
+                await this.drawData();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        })();
+    }
+}
+
+class ORGANISATION_DISPLAY extends PERSON_DISPLAY {
+    constructor() {
+        super();
+    }
+    render() {
+        let orgName = this.getAttribute('name');
+        let missionStatement = this.refers_to.captions[0]; // mission statement from captions[0]
+
+        this.innerHTML = `
+            <div class="organization-display">
+                <h1>${orgName}</h1>
+                <p>${missionStatement}</p>
+            </div>
+        `;
+    }
+}
+
+class STORY_DISPLAY extends PERSON_DISPLAY {
+    constructor() {
+        super();
+    }
+    render() {
+        let storyTitle = this.getAttribute('name');
+        let storyText = this.refers_to.captions[0] ? this.refers_to.captions[0] : ''; // story text from captions[0]
+        let storyImages = this.refers_to.images; // array of image objects
+        let references = this.refers_to.references; // array of reference objects
+
+        console.log(storyImages)
+
+        this.innerHTML = `
+            <div class="story-display">
+                <h1>${storyTitle}</h1>
+                <div class="story-images">
+                    ${storyImages.map(image => `
+                        <img src="${'/lib/images/' + image}" alt="${'image missing'}">
+                    `).join('')}
+                </div>
+                <p>${storyText}</p>
+                ${references.map((reference,index) => `
+                    <reference-display name="${storyTitle}" index="${index}"></reference-display>
+                `).join('')}
+            </div>
+        `;
     }
 }
 
@@ -431,4 +656,7 @@ if ('customElements' in window) {
     customElements.define('show-all-dropdown',SHOW_ALL_DROPDOWN)
     customElements.define('ecosystem-display',ECOSYSTEM_DISPLAY)
     customElements.define('earthhub-border',EarthhubBorder)
+    customElements.define('organisation-display',ORGANISATION_DISPLAY)
+    customElements.define('story-display',STORY_DISPLAY)
+    customElements.define('reference-display',REFERENCE_DISPLAY)
 }

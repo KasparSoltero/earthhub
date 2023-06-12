@@ -16,21 +16,31 @@ export class Earthhub_Base {
 }
 
 export class Reference extends Earthhub_Base {
-    constructor(key='', title = '', authors = '', year = '', journal = '', volume = '', number = '', pages = '', doi = '', url = '') {
+    constructor({ key, title, url, author, urldate, file, date, note, volume, issn, doi, pages, number, journaltitle, shortjournal, pmid, keywords }) {
         super();
-        // Reference class attributes
-        this.key = key;
-        this.title = title;
-        this.authors = authors;
-        this.year = year;
-        this.journal = journal;
-        this.volume = volume;
-        this.number = number;
-        this.pages = pages;
-        this.doi = doi;
-        this.url = url;
+        this.key = key || '';
+        this.title = title || '';
+        this.url = url || '';
+        this.author = author || '';
+        this.urldate = urldate || '';
+        this.file = file || '';
+        this.date = date || '';
+        this.note = note || '';
+        this.volume = volume || '';
+        this.issn = issn || '';
+        this.doi = doi || '';
+        this.pages = pages || '';
+        this.number = number || '';
+        this.journaltitle = journaltitle || '';
+        this.shortjournal = shortjournal || '';
+        this.author = author || '';
+        this.pmid = pmid || '';
+        this.keywords = keywords || '';
     }
     // Reference class methods
+    render() {
+
+    }
 }
 
 export class Contributions extends Earthhub_Base {
@@ -216,5 +226,17 @@ export class Agriculture extends Production {
     constructor() {
         this.carbon_emissions = new Carbon_emissions;
         this.livestock = new Livestock;
+    }
+}
+
+export class Organisation extends Earthhub_Base {
+    constructor() {
+        super();
+    }
+}
+
+export class Story extends Earthhub_Base {
+    constructor() {
+        super();
     }
 }
