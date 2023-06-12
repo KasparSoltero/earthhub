@@ -380,7 +380,7 @@ class ECOSYSTEM_DISPLAY extends PERSON_DISPLAY {
     
             // Draw the background image
             svg.append('image')
-            .attr('xlink:href', 'lib/images/' + this.refers_to.images[0])
+            .attr('xlink:href', window.location.origin+'/lib/images/' + this.refers_to.images[0])
             .attr('width', 'calc('+mapSize.width+'px - 10px)')
             .attr('height', 'calc('+mapSize.width+'px - 10px)');
 
@@ -595,14 +595,12 @@ class STORY_DISPLAY extends PERSON_DISPLAY {
         let storyImages = this.refers_to.images; // array of image objects
         let references = this.refers_to.references; // array of reference objects
 
-        console.log(storyImages)
-
         this.innerHTML = `
             <div class="story-display">
                 <h1>${storyTitle}</h1>
                 <div class="story-images">
                     ${storyImages.map(image => `
-                        <img src="${'/lib/images/' + image}" alt="${'image missing'}">
+                        <img src="${window.location.origin+'/lib/images/' + image}" alt="${'image missing'}">
                     `).join('')}
                 </div>
                 <p>${storyText}</p>
@@ -655,5 +653,4 @@ if ('customElements' in window) {
     customElements.define('earthhub-border',EarthhubBorder)
     customElements.define('organisation-display',ORGANISATION_DISPLAY)
     customElements.define('story-display',STORY_DISPLAY)
-    customElements.define('reference-display',REFERENCE_DISPLAY)
 }
