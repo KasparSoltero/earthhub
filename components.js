@@ -102,8 +102,6 @@ class PERSON_DISPLAY extends HTMLElement{
         } else {
             throw new Error(`Class "${className}" not found`);
         }
-
-        console.log(this.refers_to); // Output: associated instance for testing
     }
 
     render() {
@@ -111,7 +109,6 @@ class PERSON_DISPLAY extends HTMLElement{
     }
 
     connectedCallback () {
-        console.log('connected!', this)
         // Access the 'name' attribute, set the 'person' class which the html element draws from.
         this.findPersonClass()
 		// Render HTML, event handlers etc

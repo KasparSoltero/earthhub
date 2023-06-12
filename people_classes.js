@@ -48,6 +48,7 @@ export class Native_Trees extends Story {
     constructor() {
         super();
         this.images = ['story-native-trees-0.png','story-native-trees-1.png']
+        this.captions = ['Data was sourced from iNaturalist Research-Grade observations, and stylised for visual clarity. The 60 most commonly observed tree species in each location are included, where a tree was defined as any plant that can grow over 3 m.']
         this.references = [
             new Reference({
                 key: 'barnagaud_habitat_2014',
