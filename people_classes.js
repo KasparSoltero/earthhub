@@ -82,7 +82,6 @@ export class Native_Trees extends Story {
                 author: 'Malcolm, Tame',
                 urldate: '2023-06-12',
                 langid: 'english',
-                file: 'Snapshot:C:\\Users\\khs36\\Zotero\\storage\\QBHTKPR4\\3150-kaitiakitanga-with-tame-malcolm.html:text/html'
               }),
         ]
     }
