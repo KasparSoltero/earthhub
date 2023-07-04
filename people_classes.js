@@ -40,7 +40,7 @@ export class Otautahi extends Whenua {
 export class Earthhub extends Organisation {
     constructor() {
         super();
-        this.captions = ["We seek a just and immediate systemic change to the city of Ōtautahi, to recognise rangitiratanga and fulfill te Tiriti o Waitangi, and to abolish the heirarchies of ability, age, class, faith, gender, race, and sexuality. We advocate the tikanga māori led ceasing of all extractive dependancies of the city, and the restoration of all rākau, manu, and ika species native to Ōtautahi. We practice this change through social and physical media, collaboration, agitation, and direct action"]
+        // this.captions = ["We seek a just and immediate systemic change to the city of Ōtautahi, to recognise rangitiratanga and fulfill te Tiriti o Waitangi, and to abolish the heirarchies of ability, age, class, faith, gender, race, and sexuality. We advocate the tikanga māori led ceasing of all extractive dependancies of the city, and the restoration of all rākau, manu, and ika species native to Ōtautahi. We practice this change through social and physical media, collaboration, agitation, and direct action"]
     }
 }
 

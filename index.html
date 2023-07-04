@@ -5,40 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
     <title>EARTHHUB</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <!-- <link rel="import" href="components.js"> -->
-    <!-- <link rel="import" href="border.html"> -->
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
     <script type='module' src="people_classes.js"></script>
     <script type='module' src="components.js"></script>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
   </head>
+
   <body>
     <page>
-      <!-- <reference_object_container>
-        <reference-object class="banner">
-          ‘Current adaptation efforts are not expected to meet existing goals.’
-        </reference-object>
-        <reference-object class="image" media="lib/images/otakaro-birdseye.png">
-          <caption>
-            <h1>Ōtākaro regeneration</h1>
-            <h2>Caption h2</h2>
-          </caption>
-        </reference-object>
-        <reference-object class="image">
-        </reference-object>
-      </reference_object_container> -->
-
       <organisation-display name="Earthhub"></organisation-display>
-      <!-- <html-display name="Otautahi"></html-display> -->
-      <!-- <show-all name="Otautahi"></show-all> -->
-      <ecosystem-display name="Otautahi.ecosystem"></ecosystem-display>
-      <!-- <show-all-dropdown name="Otautahi"></show-all-dropdown> -->
-      <story-display name="Native_Trees"></story-display>
     </page>
 
-    <border class="left"></border>
-    <border class="right"></border>
-    <earthhub-border></earthhub-border>
+    <border-container id="border-container-left"></border-container>
+    <border-container id="border-container-right"></border-container>
+
+    <script>
+      fetch('page-components/border-left.html')
+      .then(response => response.text())
+      .then(data => document.querySelector('#border-container-left').innerHTML = data);
+      fetch('page-components/border-right.html')
+      .then(response => response.text())
+      .then(data => document.querySelector('#border-container-right').innerHTML = data);
+    </script>
   </body>
 </html>

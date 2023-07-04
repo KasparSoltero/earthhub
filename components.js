@@ -1,3 +1,4 @@
+// Defines custom html renders for types of things in the earthhub
 import { Earthhub_Base, Value } from './definition_classes.js'
 
 class Example extends HTMLElement{
@@ -28,35 +29,6 @@ class Example extends HTMLElement{
 	}
 }
 
-class ReferenceObject extends HTMLElement{
-    constructor () {
-		super();
-        this.media_ref_switch = false;
-	}
-    loadMedia() {
-        let media = this.getAttribute('media')
-        this.innerHTML="<img src="+media+" alt='missing media'>"
-    }
-    loadRef() {
-        let ref = 'temp'
-        this.innerHTML=ref
-    }
-	connectedCallback () {
-        // path="lib/images/otakaro-bordseye.png"
-        // this.innerHTML = '<reference_object></reference_object>'
-        // console.log(this)
-        if(this.className=='image') {
-            this.loadMedia()
-        }
-        this.onclick=(()=>{
-            this.media_ref_switch ? this.loadMedia() : this.loadRef()
-            this.media_ref_switch = !this.media_ref_switch
-        })
-	}
-	disconnectedCallback () {
-	}
-}
-
 class BASIC_DISPLAY extends HTMLElement{
     constructor () {
         super();
@@ -70,7 +42,38 @@ class BASIC_DISPLAY extends HTMLElement{
         this.render();
 	}
 }
+class VALUE_DISPLAY extends HTMLElement {
+    constructor() {
+      super();
+    }
 
+    connectedCallback() {
+        this.render()
+    }
+  
+    render() {
+        const value = this.getAttribute('value');
+        const unit = this.getAttribute('unit');
+        const reference = this.getAttribute('references');
+        const captions = this.getAttribute('captions');
+        
+        let output = `${value} (${unit}) ${captions}`;
+        
+        // if (reference.length>=1) {
+        //     console.log('adding references')
+        //     const arrayDisplayElement = document.createElement('reference-display');
+        //     arrayDisplayElement.setAttribute('name', `${this.getAttribute('name')}.references}`);
+        //     this.appendChild(arrayDisplayElement);
+        //     console.log(arrayDisplayElement)
+          
+        //     // output += ` [${reference}]`;
+        // }
+        
+        this.innerHTML = output;
+      }
+}
+
+// person display is used for all things which really exist and have a name i.e. not 'people' but 'Tautahi'
 class PERSON_DISPLAY extends HTMLElement{
     constructor() {
         super();
@@ -291,38 +294,6 @@ class ARRAY_DISPLAY extends PERSON_DISPLAY {
         return container.innerHTML; // Return the HTML content of the container
     }
 }
-
-class VALUE_DISPLAY extends HTMLElement {
-    constructor() {
-      super();
-    }
-
-    connectedCallback() {
-        this.render()
-    }
-  
-    render() {
-        const value = this.getAttribute('value');
-        const unit = this.getAttribute('unit');
-        const reference = this.getAttribute('references');
-        const captions = this.getAttribute('captions');
-        
-        let output = `${value} (${unit}) ${captions}`;
-        
-        // if (reference.length>=1) {
-        //     console.log('adding references')
-        //     const arrayDisplayElement = document.createElement('reference-display');
-        //     arrayDisplayElement.setAttribute('name', `${this.getAttribute('name')}.references}`);
-        //     this.appendChild(arrayDisplayElement);
-        //     console.log(arrayDisplayElement)
-          
-        //     // output += ` [${reference}]`;
-        // }
-        
-        this.innerHTML = output;
-      }
-}
-
 class ECOSYSTEM_DISPLAY extends PERSON_DISPLAY {
     constructor() {
         super();
@@ -572,7 +543,6 @@ class ECOSYSTEM_DISPLAY extends PERSON_DISPLAY {
         })();
     }
 }
-
 class ORGANISATION_DISPLAY extends PERSON_DISPLAY {
     constructor() {
         super();
@@ -589,7 +559,6 @@ class ORGANISATION_DISPLAY extends PERSON_DISPLAY {
         `;
     }
 }
-
 class STORY_DISPLAY extends PERSON_DISPLAY {
     constructor() {
         super();
@@ -627,9 +596,9 @@ class EarthhubBorder extends HTMLElement {
         <div class='border-left'></div>
         <div class='border-right'></div>
         `
-        this.updateBorderHeight();
+        // this.updateBorderHeight();
     
-        window.addEventListener('scroll', this.updateBorderHeight.bind(this));
+        // window.addEventListener('scroll', this.updateBorderHeight.bind(this));
     }
   
     updateBorderHeight() {
@@ -646,16 +615,17 @@ class EarthhubBorder extends HTMLElement {
 // Define web components for html
 if ('customElements' in window) {
 	customElements.define('example-example', Example)
-    customElements.define('reference-object',ReferenceObject)
-    customElements.define('person-display',PERSON_DISPLAY)
-    customElements.define('show-all',SHOW_ALL)
     customElements.define('basic-display',BASIC_DISPLAY)
-    customElements.define('array-display',ARRAY_DISPLAY)
     customElements.define('value-display', VALUE_DISPLAY)
+
+    customElements.define('person-display',PERSON_DISPLAY)
     customElements.define('reference-display',REFERENCE_DISPLAY)
     customElements.define('show-all-dropdown',SHOW_ALL_DROPDOWN)
+    customElements.define('show-all',SHOW_ALL)
+    customElements.define('array-display',ARRAY_DISPLAY)
     customElements.define('ecosystem-display',ECOSYSTEM_DISPLAY)
-    customElements.define('earthhub-border',EarthhubBorder)
     customElements.define('organisation-display',ORGANISATION_DISPLAY)
     customElements.define('story-display',STORY_DISPLAY)
+
+    customElements.define('earthhub-border',EarthhubBorder)
 }

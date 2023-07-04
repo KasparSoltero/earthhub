@@ -1,4 +1,25 @@
 :root {
+	--mag: #F432BB;
+	--red: #F52F41;
+	--ora: #FABB33;
+	--lim: #BBFF34;
+	--gre: #59FF35;
+	--cya: #57FFBB;
+	--sky: #38BAFF;
+	--blu: #3632FF;
+	--pur: #BC32FE;
+
+	--color-0: #F432BB;
+	--color-1: #F52F41;
+	--color-2: #FABB33;
+	--color-3: #BBFF34;
+	--color-4: #59FF35;
+	--color-5: #57FFBB;
+	--color-6: #38BAFF;
+	--color-7: #3632FF;
+	--color-8: #BC32FE;
+	--color-base: #000;
+
 	--page-color: #aaa499;
 	--page-border-color: #000;
 	--empty-color:#ecd8c3;
@@ -15,33 +36,63 @@ body {
 	margin:0;
 }
 
-/* EARTHHUB */
-earthhub-border {
-	box-sizing: border-box;
+/* EARTHHUB border */
+border-container {
+	display: flex;
+	width: 8vw;
+	height: 100vh;
+	padding: 0.2em 0 0 0.2em;
+	background-color: var(--color-base);
+}
+#border-container-left {
+	float: left;
+}
+#border-container-right {
+	float: right;
+}
+.earthhub-vertical-text {
 	position: absolute;
-	z-index: -1;
-	width: 100vw;
-	height: 120vh;
+	height: calc(100vh - 3em);
+	fill: var(--color-0);
+} 
+#evt-1 {
+	fill: var(--color-1);
 }
-.border-left::before {
-	left: 0;
+#evt-2 {
+	transform: translate(1em,1em);
+	fill: var(--color-2);
 }
-.border-right::before {
-	right: 0;
+#evt-3 {
+	transform: translate(2em,2em);
+	fill: var(--color-3);
+}
+#evt-4 {
+	fill: var(--pur);
+}
+#evt-5 {
+	transform: translate(1em,1em);
+	fill: var(--cya);
+}
+#evt-6 {
+	transform: translate(2em,2em);
+	fill: var(--mag);
 }
 
-.border-left::before, .border-right::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	width: 10vw;
-	background-color: var(--page-border-color);
-	background-image: url('lib/graphics/border.png');
-	background-repeat: repeat-y;
-	background-position: top;
-	background-size: auto;
-	background-width: 100%;
+/* EARTHHUB main page */
+page {
+	box-sizing: border-box;
+	width:84vw;
+
+	min-height:100vh;
+
+	z-index:8;
+	position:absolute;
+	left:8vw;
+
+	background-color: var(--color-base);
+
+	padding-top:var(--margins-width);
+	padding-bottom:var(--margins-width);
 }
 
 #dropdownContainer {
@@ -156,21 +207,7 @@ reference-display {
 	color: #000000;
 }
 
-page {
-	box-sizing: border-box;
-	/* display:flex; */
-	/* width:calc(var(--page-width) - calc(2 * var(--margins-width))); */
-	/* width:var(--page-width); */
-	width:80vw;
-	min-height:calc(100vh - calc(2 * var(--margins-width)));
-	z-index:8;
-	position:absolute;
-	/* display:block; */
-	left:10vw;
-	background-color: var(--page-color);
-	padding-top:var(--margins-width);
-	padding-bottom:var(--margins-width);
-}
+
 
 reference_object_container {
 	width:calc(var(--page-width) - calc(2 * var(--margins-width)));

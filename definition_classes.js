@@ -147,7 +147,7 @@ export class Ecosystem extends Earthhub_Base {
 
                 // Add the record to the filtered records array if it passes the filter
                 if (includeRecord) {
-                    console.log('includeRecord')
+                    // console.log('includeRecord')
                     records.push(record);
                 }
             }
