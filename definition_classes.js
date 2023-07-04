@@ -108,8 +108,10 @@ export class Ecosystem extends Earthhub_Base {
         try {
           // Load the data asynchronously
             const response = await fetch(this.data.observations.path);
+
             const data = await response.text();
             const lines = data.split('\n');
+
         
             // Determine the categories based on the first line
             const categories = lines[0].split('\t');
@@ -145,6 +147,7 @@ export class Ecosystem extends Earthhub_Base {
 
                 // Add the record to the filtered records array if it passes the filter
                 if (includeRecord) {
+                    console.log('includeRecord')
                     records.push(record);
                 }
             }

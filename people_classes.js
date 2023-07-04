@@ -31,8 +31,8 @@ export class Otautahi extends Whenua {
             new Value({value:'waitaha'}),
             new Value({value:'karaitiana'}).setCaption('transliteration of christian, used before 1930-1940'),
         ]
-        this.ecosystem.data = {observations: {path: 'lib/data/otautahi_observations.txt'}}
-        this.ecosystem.images = ['otautahi-ecosystem-background.png']
+        this.ecosystem.data = {observations: {path: 'lib/data/otautahi_observations.txt'}} // earthhub/
+        this.ecosystem.images = ['lib/images/otautahi-ecosystem-background.png'] // earthhub/
         this.ecosystem.captions = ['Data sourced from New Zealand Garden Bird Survey, iNaturalist Research-grade Observations, and eBird Observation Dataset: https://doi.org/10.15468/dl.95yhwr']
     }
 }
@@ -47,7 +47,7 @@ export class Earthhub extends Organisation {
 export class Native_Trees extends Story {
     constructor() {
         super();
-        this.images = ['story-native-trees-0.png','story-native-trees-1.png']
+        this.images = ['lib/images/story-native-trees-0.png','lib/images/story-native-trees-1.png'] // earthhub/
         this.captions = ['Data was sourced from iNaturalist Research-Grade observations, and stylised for visual clarity. The 60 most commonly observed tree species in each location are included, where a tree was defined as any plant that can grow over 3 m.']
         this.references = [
             new Reference({
